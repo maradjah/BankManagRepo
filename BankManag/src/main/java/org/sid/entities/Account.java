@@ -1,11 +1,16 @@
 package org.sid.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,13 +23,13 @@ public class Account implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "account_id")
-	private Long accountID;
+	private Long accountId;
 	private String description;
 	private double balance;
 	private Date creationDate;
 
-	@ManyToMany(mappedBy = "accounts")
-	private Collection<Customer> owners;
+	@ManyToMany(mappedBy = "accounts", fetch = FetchType.EAGER)
+	private List<Customer> customers = new ArrayList<Customer>();
 
 	@OneToMany(mappedBy = "account")
 	private Collection<Tx> transactions;
@@ -32,6 +37,17 @@ public class Account implements Serializable {
 	public Account() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	public void setCustomer(Customer customer) {
+		setCustomer(customer, true);
+	}
+
+	void setCustomer(Customer customer, boolean add) {
+		this.customers.add(customer);
+		if (customer != null && add) {
+			customer.addAccount(this, false);
+		}
 	}
 
 	public Collection<Tx> getTransactions() {
@@ -57,13 +73,13 @@ public class Account implements Serializable {
 		this.creationDate = creationDate;
 	}
 
-	public Long getAccountID() {
-		return accountID;
-	}
-
-	public void setAccountID(Long accountID) {
-		this.accountID = accountID;
-	}
+//	public Long getAccountID() {
+//		return accountId;
+//	}
+//
+//	public void setAccountID(Long accountID) {
+//		this.accountId = accountID;
+//	}
 
 	public String getDescription() {
 		return description;
@@ -81,12 +97,12 @@ public class Account implements Serializable {
 		this.balance = balance;
 	}
 
-	public Collection<Customer> getOwners() {
-		return owners;
+	public List<Customer> getCustomers() {
+		return customers;
 	}
 
-	public void setOwners(Collection<Customer> owners) {
-		this.owners = owners;
+	public void setCustomers(List<Customer> customers) {
+		this.customers = customers;
 	}
 
 }

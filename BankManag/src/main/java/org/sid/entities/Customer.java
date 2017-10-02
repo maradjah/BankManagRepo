@@ -1,13 +1,17 @@
 package org.sid.entities;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
@@ -21,7 +25,7 @@ public class Customer implements Serializable {
 	@Id
 	@Column(name = "customer_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long customerID;
+	private Long customerId;
 	@Column(name = "last_name")
 	private String lastName;
 	@Column(name = "first_name")
@@ -37,9 +41,9 @@ public class Customer implements Serializable {
 	@Column(name = "email")
 	private String email;
 
-	@ManyToMany
-	@JoinTable(name = "CUST_ACCS")
-	private Collection<Account> accounts;
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+	@JoinTable(name = "CUST_ACCS", joinColumns = { @JoinColumn(name = "customer_id") }, inverseJoinColumns = { @JoinColumn(name = "account_id") })
+	private List<Account> accounts = new ArrayList<Account>();
 
 	public Customer() {
 		super();
@@ -58,13 +62,43 @@ public class Customer implements Serializable {
 		this.email = email;
 	}
 
-	public Long getCustomerID() {
-		return customerID;
+	public void addAccount(Account account) {
+		addAccount(account, true);
 	}
 
-	public void setCustomerID(Long customerID) {
-		this.customerID = customerID;
+	void addAccount(Account account, boolean set) {
+		if (account != null) {
+			if (getAccounts().contains(account)) {
+				getAccounts().set(getAccounts().indexOf(account), account);
+			} else {
+				getAccounts().add(account);
+			}
+			if (set) {
+				account.setCustomer(this, false);
+			}
+		}
 	}
+
+	public void removeAccount(Account account) {
+		getAccounts().remove(account);
+		account.setCustomer(null);
+	}
+
+	public List<Account> getAccounts() {
+		return accounts;
+	}
+
+	public void setAccounts(List<Account> accounts) {
+		this.accounts = accounts;
+	}
+
+	// public Long getCustomerID() {
+	// return customerId;
+	// }
+	//
+	// public void setCustomerID(Long customerID) {
+	// this.customerId = customerID;
+	// }
 
 	public String getLastName() {
 		return lastName;
@@ -122,17 +156,8 @@ public class Customer implements Serializable {
 		this.email = email;
 	}
 
-	public Collection<Account> getAccounts() {
-		return accounts;
-	}
-
-	public void setAccounts(Collection<Account> accounts) {
-		this.accounts = accounts;
-	}
-
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-		
 
 }

@@ -6,9 +6,15 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
 
-	<!-- <bean id="dao" class="org.sid.dao.AbonnementDAOImpl"></bean> <bean 
-		id="metier" class="org.sid.metier.AbonnementMetierImpl"> <property name="dao" 
-		ref="dao"></property> </bean> -->
+	<bean id="dao" class="org.sid.dao.AccountDAOImpl"></bean>
+	<bean id="metier" class="org.sid.metier.AccountMetierImpl">
+		<property name="dao" ref="dao"></property>
+	</bean>
+	
+	<bean id="daoc" class="org.sid.dao.CustomerDAOImpl"></bean>
+	<bean id="metierc" class="org.sid.metier.CustomerMetierImpl">
+		<property name="daoc" ref="daoc"></property>
+	</bean>
 
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
@@ -29,7 +35,6 @@
 		</property>
 		<property name="defaultDataSource" ref="dataSource"></property>
 	</bean>
-
 
 
 	<bean id="entityManagerFactory"
